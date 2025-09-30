@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Finance Dashboard{% endblock %}
+{% block page_title %}Financial Overview{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Total Balance Card -->
+    <div class="col-12 mb-4">
+        <div class="card account-card">
+            <div class="card-body text-center">
+                <h3 class="card-title">
+                    <i class="fas fa-wallet"></i> Total Portfolio Value
+                </h3>
+                <div class="balance-display">${{ "%.2f"|format(total_balance) }}</div>
+                <p class="card-text">Across all accounts</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Account Cards -->
+    {% for account in accounts %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card account-card {{ account.type.lower() }}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">
+                            {% if account.type == 'investment' %}
+                                <i class="fas fa-chart-line account-type-icon"></i>
+                            {% elif account.type == 'checking' %}
+                                <i class="fas fa-credit-card account-type-icon"></i>
+                            {% elif account.type == 'savings' %}
+                                <i class="fas fa-piggy-bank account-type-icon"></i>
+                            {% elif account.type == 'stock' %}
+                                <i class="fas fa-chart-bar account-type-icon"></i>
+                            {% else %}
+                                <i class="fas fa-university account-type-icon"></i>
+                            {% endif %}
+                            {{ account.name }}
+                        </h5>
+                        <p class="card-text text-capitalize">{{ account.type }} Account</p>
+                    </div>
+                    <span class="badge bg-light text-dark">{{ account.currency }}</span>
+                </div>
+                
+                <div class="balance-display mb-3">
+                    ${{ "%.2f"|format(account.balance) }}
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <small class="text-white-50">
+                        Updated: {{ account.updated_at[:10] }}
+                    </small>
+                    <a href="{{ url_for('account_detail', account_id=account.id) }}" 
+                       class="btn btn-light btn-sm">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <!-- Add Account Card -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card" style="border: 2px dashed #dee2e6;">
+            <div class="card-body text-center d-flex flex-column justify-content-center" style="min-height: 200px;">
+                <i class="fas fa-plus-circle text-muted mb-3" style="font-size: 3rem;"></i>
+                <h5 class="card-title text-muted">Add New Account</h5>
+                <p class="card-text text-muted">Track another financial account</p>
+                <a href="{{ url_for('add_account') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> Add Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie"></i> Account Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="accountChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar"></i> Account Types Summary
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="typeChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Account Distribution Chart
+const accountCtx = document.getElementById('accountChart').getContext('2d');
+const accountChart = new Chart(accountCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for account in accounts %}
+            '{{ account.name }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for account in accounts %}
+                {{ account.balance }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#667eea', '#764ba2', '#f093fb', '#f5576c', 
+                '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',
+                '#fa709a', '#fee140'
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': $' + context.parsed.toFixed(2);
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Account Types Summary Chart
+fetch('/api/account_summary')
+    .then(response => response.json())
+    .then(data => {
+        const typeCtx = document.getElementById('typeChart').getContext('2d');
+        const typeChart = new Chart(typeCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data).map(type => type.charAt(0).toUpperCase() + type.slice(1)),
+                datasets: [{
+                    label: 'Total Balance',
+                    data: Object.values(data).map(item => item.total),
+                    backgroundColor: [
+                        '#667eea', '#764ba2', '#f093fb', '#f5576c'
+                    ],
+                    borderColor: [
+                        '#667eea', '#764ba2', '#f093fb', '#f5576c'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Total: $' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

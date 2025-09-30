@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Stocks & Crypto - Finance Dashboard{% endblock %}
+{% block page_title %}Stocks & Cryptocurrency{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stock Holdings -->
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3><i class="fas fa-chart-line text-primary"></i> Stock Holdings</h3>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                <i class="fas fa-plus"></i> Add Stock
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if stocks %}
+        {% for stock in stocks %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">{{ stock[0] }}</h5>
+                            <p class="text-muted">{{ stock[1] }} shares</p>
+                        </div>
+                        <div class="text-end">
+                            {% if stock[3] %}
+                                <div class="h5 text-primary">${{ "%.2f"|format(stock[3]) }}</div>
+                                <small class="text-muted">Current Price</small>
+                            {% else %}
+                                <div class="h5 text-muted">$0.00</div>
+                                <small class="text-muted">Price Pending</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <small class="text-muted">Purchase Price</small>
+                            <div>${{ "%.2f"|format(stock[2] or 0) }}</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Total Value</small>
+                            <div class="fw-bold">
+                                {% if stock[3] %}
+                                    ${{ "%.2f"|format(stock[1] * stock[3]) }}
+                                {% else %}
+                                    $0.00
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if stock[4] %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Updated: {{ stock[4][:16] }}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-chart-line text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted">No Stock Holdings</h4>
+                    <p class="text-muted">Add your stock holdings to track their performance.</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                        <i class="fas fa-plus"></i> Add Your First Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Crypto Holdings -->
+<div class="row mt-5">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3><i class="fas fa-coins text-warning"></i> Cryptocurrency Holdings</h3>
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addCryptoModal">
+                <i class="fas fa-plus"></i> Add Crypto
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if crypto %}
+        {% for coin in crypto %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">{{ coin[0] }}</h5>
+                            <p class="text-muted">{{ coin[1] }} {{ coin[0] }}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if coin[3] %}
+                                <div class="h5 text-warning">${{ "%.2f"|format(coin[3]) }}</div>
+                                <small class="text-muted">Current Price</small>
+                            {% else %}
+                                <div class="h5 text-muted">$0.00</div>
+                                <small class="text-muted">Price Pending</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <small class="text-muted">Purchase Price</small>
+                            <div>${{ "%.2f"|format(coin[2] or 0) }}</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Total Value</small>
+                            <div class="fw-bold">
+                                {% if coin[3] %}
+                                    ${{ "%.2f"|format(coin[1] * coin[3]) }}
+                                {% else %}
+                                    $0.00
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if coin[4] %}
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> Updated: {{ coin[4][:16] }}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-coins text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted">No Cryptocurrency Holdings</h4>
+                    <p class="text-muted">Add your crypto holdings to track their performance.</p>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#addCryptoModal">
+                        <i class="fas fa-plus"></i> Add Your First Crypto
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-chart-line"></i> Add Stock Holding
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_stock_holding') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="symbol" class="form-label">Stock Symbol</label>
+                        <input type="text" class="form-control" id="symbol" name="symbol" 
+                               placeholder="e.g., AAPL, GOOGL, MSFT" required>
+                        <div class="form-text">Enter the stock ticker symbol (e.g., AAPL for Apple)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="shares" class="form-label">Number of Shares</label>
+                        <input type="number" class="form-control" id="shares" name="shares" 
+                               step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="purchase_price" class="form-label">Purchase Price (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="purchase_price" name="purchase_price" 
+                                   step="0.01" min="0">
+                        </div>
+                        <div class="form-text">Enter the price you paid per share (for profit/loss tracking)</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Crypto Modal -->
+<div class="modal fade" id="addCryptoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-coins"></i> Add Cryptocurrency Holding
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_crypto_holding') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="symbol" class="form-label">Cryptocurrency Symbol</label>
+                        <input type="text" class="form-control" id="symbol" name="symbol" 
+                               placeholder="e.g., BTC, ETH, ADA" required>
+                        <div class="form-text">Enter the crypto symbol (e.g., BTC for Bitcoin)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <input type="number" class="form-control" id="amount" name="amount" 
+                               step="0.00000001" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="purchase_price" class="form-label">Purchase Price (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="purchase_price" name="purchase_price" 
+                                   step="0.01" min="0">
+                        </div>
+                        <div class="form-text">Enter the price you paid per unit (for profit/loss tracking)</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Add Crypto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sync Info -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-info-circle"></i> Data Updates
+                </h6>
+                <p class="card-text">
+                    Stock and cryptocurrency prices are updated when you sync your data. 
+                    Go to <a href="{{ url_for('sync_data') }}">Sync Data</a> to get the latest prices.
+                </p>
+                <div class="alert alert-info">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Privacy:</strong> All data is fetched directly from Yahoo Finance and stored locally on your device.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

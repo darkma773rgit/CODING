@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}{{ account.name }} - Finance Dashboard{% endblock %}
+{% block page_title %}{{ account.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Account Overview -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h3 class="card-title">
+                            {% if account.type == 'investment' %}
+                                <i class="fas fa-chart-line text-primary"></i>
+                            {% elif account.type == 'checking' %}
+                                <i class="fas fa-credit-card text-success"></i>
+                            {% elif account.type == 'savings' %}
+                                <i class="fas fa-piggy-bank text-info"></i>
+                            {% elif account.type == 'stock' %}
+                                <i class="fas fa-chart-bar text-warning"></i>
+                            {% else %}
+                                <i class="fas fa-university text-secondary"></i>
+                            {% endif %}
+                            {{ account.name }}
+                        </h3>
+                        <p class="text-muted text-capitalize">{{ account.type }} Account</p>
+                        {% if account_data.institution %}
+                        <p class="text-muted">
+                            <i class="fas fa-university"></i> {{ account_data.institution }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="balance-display text-primary">
+                            ${{ "%.2f"|format(account_data.balance) }}
+                        </div>
+                        <small class="text-muted">{{ account_data.currency }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Account Details -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i> Account Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><strong>Account Type:</strong></td>
+                        <td class="text-capitalize">{{ account.type }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Current Balance:</strong></td>
+                        <td class="text-success">${{ "%.2f"|format(account_data.balance) }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Currency:</strong></td>
+                        <td>{{ account_data.currency }}</td>
+                    </tr>
+                    {% if account_data.institution %}
+                    <tr>
+                        <td><strong>Institution:</strong></td>
+                        <td>{{ account_data.institution }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if account_data.account_number %}
+                    <tr>
+                        <td><strong>Account Number:</strong></td>
+                        <td>****{{ account_data.account_number }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                        <i class="fas fa-plus"></i> Add Transaction
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="fas fa-edit"></i> Edit Account
+                    </button>
+                    <button class="btn btn-outline-info">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history"></i> Recent Transactions
+                </h5>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                    <i class="fas fa-plus"></i> Add Transaction
+                </button>
+            </div>
+            <div class="card-body">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.date[:10] }}</td>
+                                <td>{{ transaction.description or 'No description' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if transaction.type == 'credit' else 'danger' }}">
+                                        {{ transaction.type.title() }}
+                                    </span>
+                                </td>
+                                <td class="{{ 'text-success' if transaction.type == 'credit' else 'text-danger' }}">
+                                    ${{ "%.2f"|format(transaction.amount) }}
+                                </td>
+                                <td>{{ transaction.notes or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-receipt text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted mt-3">No transactions yet</h5>
+                    <p class="text-muted">Add your first transaction to start tracking this account.</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                        <i class="fas fa-plus"></i> Add Transaction
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus"></i> Add Transaction
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_transaction', account_id=account.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   step="0.01" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="transaction_type" class="form-label">Type</label>
+                        <select class="form-select" id="transaction_type" name="transaction_type" required>
+                            <option value="debit">Debit (Money Out)</option>
+                            <option value="credit">Credit (Money In)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <input type="text" class="form-control" id="description" name="description" 
+                               placeholder="e.g., Grocery shopping, Salary deposit">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" 
+                               value="{{ moment().format('YYYY-MM-DD') }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Set today's date as default
+document.getElementById('date').value = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

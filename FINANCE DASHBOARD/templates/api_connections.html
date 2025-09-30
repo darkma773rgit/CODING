@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}API Connections - Finance Dashboard{% endblock %}
+{% block page_title %}API Connections{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>Connected Financial Services</h3>
+            <a href="{{ url_for('add_api_connection') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Connection
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    {% if connections %}
+        {% for connection in connections %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title">
+                                {% if connection.api_type == 'plaid' %}
+                                    <i class="fas fa-university text-primary"></i>
+                                {% elif connection.api_type == 'yfinance' %}
+                                    <i class="fas fa-chart-line text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-plug text-secondary"></i>
+                                {% endif %}
+                                {{ connection.institution_name }}
+                            </h5>
+                            <p class="text-muted text-capitalize">{{ connection.api_type }} API</p>
+                        </div>
+                        <span class="badge bg-{{ 'success' if connection.is_active else 'secondary' }}">
+                            {{ 'Active' if connection.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+                    
+                    {% if connection.last_sync %}
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> 
+                            Last sync: {{ connection.last_sync[:16] }}
+                        </small>
+                    </p>
+                    {% else %}
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Never synced
+                        </small>
+                    </p>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('sync_data') }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-sync-alt"></i> Sync Now
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteConnection({{ connection.id }})">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-plug text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-muted">No API Connections</h4>
+                    <p class="text-muted">Connect to your financial institutions to automatically sync account data.</p>
+                    <a href="{{ url_for('add_api_connection') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Your First Connection
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Supported Services -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i> Supported Financial Services
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-university text-primary"></i> Bank Accounts (Plaid)</h6>
+                        <ul class="list-unstyled">
+                            <li>• Chase Bank</li>
+                            <li>• Bank of America</li>
+                            <li>• Wells Fargo</li>
+                            <li>• Capital One</li>
+                            <li>• And 11,000+ other institutions</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-chart-line text-success"></i> Investment Data (Yahoo Finance)</h6>
+                        <ul class="list-unstyled">
+                            <li>• Stock prices and data</li>
+                            <li>• Cryptocurrency prices</li>
+                            <li>• Market data and trends</li>
+                            <li>• Real-time updates</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Security Note:</strong> All API credentials are encrypted and stored locally on your device. 
+                    Your data never leaves your computer and is processed securely.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteConnection(connectionId) {
+    if (confirm('Are you sure you want to remove this API connection? This will stop automatic data syncing.')) {
+        // Add delete functionality here
+        alert('Delete functionality will be implemented in the next update.');
+    }
+}
+</script>
+{% endblock %}

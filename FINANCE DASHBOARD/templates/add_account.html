@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Add Account - Finance Dashboard{% endblock %}
+{% block page_title %}Add New Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus-circle"></i> Add New Financial Account
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="account_name" class="form-label">
+                            <i class="fas fa-tag"></i> Account Name
+                        </label>
+                        <input type="text" class="form-control" id="account_name" name="account_name" 
+                               placeholder="e.g., Chase Checking, Vanguard 401k" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="account_type" class="form-label">
+                            <i class="fas fa-list"></i> Account Type
+                        </label>
+                        <select class="form-select" id="account_type" name="account_type" required>
+                            <option value="">Select account type...</option>
+                            <option value="checking">Checking Account</option>
+                            <option value="savings">Savings Account</option>
+                            <option value="investment">Investment Account (401k, IRA, etc.)</option>
+                            <option value="stock">Stock Trading Account</option>
+                            <option value="credit">Credit Card</option>
+                            <option value="loan">Loan Account</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="balance" class="form-label">
+                            <i class="fas fa-dollar-sign"></i> Current Balance
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="balance" name="balance" 
+                                   step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="currency" class="form-label">
+                            <i class="fas fa-globe"></i> Currency
+                        </label>
+                        <select class="form-select" id="currency" name="currency">
+                            <option value="USD" selected>USD - US Dollar</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="GBP">GBP - British Pound</option>
+                            <option value="CAD">CAD - Canadian Dollar</option>
+                            <option value="AUD">AUD - Australian Dollar</option>
+                            <option value="JPY">JPY - Japanese Yen</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="institution" class="form-label">
+                            <i class="fas fa-university"></i> Financial Institution
+                        </label>
+                        <input type="text" class="form-control" id="institution" name="institution" 
+                               placeholder="e.g., Chase Bank, Vanguard, Fidelity">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="account_number" class="form-label">
+                            <i class="fas fa-hashtag"></i> Account Number (Last 4 digits)
+                        </label>
+                        <input type="text" class="form-control" id="account_number" name="account_number" 
+                               placeholder="****1234" maxlength="4">
+                        <div class="form-text">Only the last 4 digits for identification purposes.</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6 class="card-title text-success">
+                    <i class="fas fa-shield-alt"></i> Security Notice
+                </h6>
+                <p class="card-text small text-muted">
+                    All sensitive information is encrypted and stored locally on your device. 
+                    Your data never leaves your computer and is protected with industry-standard encryption.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

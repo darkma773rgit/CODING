@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Add API Connection - Finance Dashboard{% endblock %}
+{% block page_title %}Add API Connection{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plug"></i> Connect Financial Service
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="apiConnectionForm">
+                    <div class="mb-3">
+                        <label for="institution_name" class="form-label">
+                            <i class="fas fa-building"></i> Institution Name
+                        </label>
+                        <input type="text" class="form-control" id="institution_name" name="institution_name" 
+                               placeholder="e.g., Chase Bank, Vanguard" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="api_type" class="form-label">
+                            <i class="fas fa-list"></i> Service Type
+                        </label>
+                        <select class="form-select" id="api_type" name="api_type" required onchange="toggleCredentials()">
+                            <option value="">Select service type...</option>
+                            <option value="plaid">Bank Accounts (Plaid)</option>
+                            <option value="yfinance">Investment Data (Yahoo Finance)</option>
+                        </select>
+                    </div>
+
+                    <!-- Plaid Credentials -->
+                    <div id="plaid-credentials" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Plaid Setup Required:</strong> You'll need to create a Plaid account and get API credentials.
+                            <a href="https://plaid.com/developers/" target="_blank" class="alert-link">Get Plaid API Keys</a>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="plaid_client_id" class="form-label">
+                                <i class="fas fa-key"></i> Plaid Client ID
+                            </label>
+                            <input type="text" class="form-control" id="plaid_client_id" name="plaid_client_id" 
+                                   placeholder="Your Plaid client ID">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="plaid_secret" class="form-label">
+                                <i class="fas fa-lock"></i> Plaid Secret
+                            </label>
+                            <input type="password" class="form-control" id="plaid_secret" name="plaid_secret" 
+                                   placeholder="Your Plaid secret key">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="plaid_access_token" class="form-label">
+                                <i class="fas fa-link"></i> Access Token
+                            </label>
+                            <input type="text" class="form-control" id="plaid_access_token" name="plaid_access_token" 
+                                   placeholder="Your access token">
+                            <div class="form-text">Get this by linking your bank account through Plaid's Link flow.</div>
+                        </div>
+                    </div>
+
+                    <!-- YFinance Info -->
+                    <div id="yfinance-info" style="display: none;">
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>No Setup Required:</strong> Yahoo Finance API is free and doesn't require credentials.
+                            Just add your stock symbols and crypto holdings to get real-time data.
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('api_connections') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Add Connection
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Setup Instructions -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-question-circle"></i> Setup Instructions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="setupAccordion">
+                    <!-- Plaid Setup -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="plaidHeader">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#plaidSetup" aria-expanded="false">
+                                <i class="fas fa-university me-2"></i> Plaid (Bank Accounts) Setup
+                            </button>
+                        </h2>
+                        <div id="plaidSetup" class="accordion-collapse collapse" data-bs-parent="#setupAccordion">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Visit <a href="https://plaid.com/developers/" target="_blank">Plaid Developers</a></li>
+                                    <li>Create a free account and get your API keys</li>
+                                    <li>Use Plaid's Link to connect your bank account</li>
+                                    <li>Copy the access token from the Link flow</li>
+                                    <li>Enter your credentials above</li>
+                                </ol>
+                                <div class="alert alert-warning">
+                                    <strong>Note:</strong> Plaid's sandbox environment is free for testing. 
+                                    Production access may require approval.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- YFinance Setup -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="yfinanceHeader">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#yfinanceSetup" aria-expanded="false">
+                                <i class="fas fa-chart-line me-2"></i> Yahoo Finance Setup
+                            </button>
+                        </h2>
+                        <div id="yfinanceSetup" class="accordion-collapse collapse" data-bs-parent="#setupAccordion">
+                            <div class="accordion-body">
+                                <p>Yahoo Finance integration is completely free and requires no setup:</p>
+                                <ol>
+                                    <li>Go to the <a href="{{ url_for('stock_data') }}">Stocks & Crypto</a> page</li>
+                                    <li>Add your stock symbols (e.g., AAPL, GOOGL, MSFT)</li>
+                                    <li>Add your cryptocurrency holdings (e.g., BTC, ETH)</li>
+                                    <li>Data will be automatically updated when you sync</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleCredentials() {
+    const apiType = document.getElementById('api_type').value;
+    const plaidDiv = document.getElementById('plaid-credentials');
+    const yfinanceDiv = document.getElementById('yfinance-info');
+    
+    // Hide all credential sections
+    plaidDiv.style.display = 'none';
+    yfinanceDiv.style.display = 'none';
+    
+    // Show relevant section
+    if (apiType === 'plaid') {
+        plaidDiv.style.display = 'block';
+    } else if (apiType === 'yfinance') {
+        yfinanceDiv.style.display = 'block';
+    }
+}
+</script>
+{% endblock %}
