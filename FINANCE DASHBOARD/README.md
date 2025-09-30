@@ -37,6 +37,7 @@ A secure, local web application for tracking and managing your financial account
 - **Automatic Data Sync**: Pull account balances and transactions automatically
 - **Secure Credential Storage**: All API credentials encrypted and stored locally
 - **Investment Tracking**: Monitor stock and crypto holdings with live prices
+- **API Management**: Edit and delete API connections with secure credential handling
 
 ## 📋 Prerequisites
 
@@ -163,6 +164,12 @@ FINANCE DASHBOARD/
 1. **Manual Sync**: Click "Sync Data" to update all connected accounts
 2. **Automatic Updates**: Stock and crypto prices update in real-time
 3. **Secure Process**: All data is fetched and stored locally
+
+### API Connection Management
+1. **Edit Connections**: Update API credentials and settings
+2. **Delete Connections**: Remove API connections permanently
+3. **Secure Operations**: All credential changes are encrypted
+4. **User Control**: Complete control over your API connections
 
 ## 🔐 Security Best Practices
 

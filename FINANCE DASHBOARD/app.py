@@ -466,6 +466,102 @@ def add_crypto_holding():
     flash(f'Added {amount} {symbol}', 'success')
     return redirect(url_for('stock_data'))
 
+@app.route('/delete_api_connection/<int:connection_id>', methods=['POST'])
+@login_required
+def delete_api_connection(connection_id):
+    """Delete an API connection"""
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    # Verify the connection belongs to the user
+    cursor.execute('''
+        SELECT institution_name FROM api_connections 
+        WHERE id = ? AND user_id = ?
+    ''', (connection_id, session['user_id']))
+    
+    connection = cursor.fetchone()
+    if not connection:
+        flash('API connection not found.', 'error')
+        conn.close()
+        return redirect(url_for('api_connections'))
+    
+    # Delete the connection
+    cursor.execute('''
+        DELETE FROM api_connections WHERE id = ? AND user_id = ?
+    ''', (connection_id, session['user_id']))
+    
+    conn.commit()
+    conn.close()
+    
+    flash(f'API connection for {connection[0]} has been deleted.', 'success')
+    return redirect(url_for('api_connections'))
+
+@app.route('/edit_api_connection/<int:connection_id>', methods=['GET', 'POST'])
+@login_required
+def edit_api_connection(connection_id):
+    """Edit an API connection"""
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
+    # Get the connection details
+    cursor.execute('''
+        SELECT institution_name, api_type, encrypted_credentials 
+        FROM api_connections WHERE id = ? AND user_id = ?
+    ''', (connection_id, session['user_id']))
+    
+    connection = cursor.fetchone()
+    if not connection:
+        flash('API connection not found.', 'error')
+        conn.close()
+        return redirect(url_for('api_connections'))
+    
+    # Decrypt credentials for editing
+    try:
+        credentials = json.loads(decrypt_data(connection[2]))
+    except:
+        credentials = {}
+    
+    conn.close()
+    
+    if request.method == 'POST':
+        institution_name = request.form['institution_name']
+        api_type = request.form['api_type']
+        
+        # Collect credentials based on API type
+        new_credentials = {}
+        if api_type == 'plaid':
+            new_credentials = {
+                'client_id': request.form['plaid_client_id'],
+                'secret': request.form['plaid_secret'],
+                'access_token': request.form['plaid_access_token']
+            }
+        elif api_type == 'yfinance':
+            new_credentials = {}
+        
+        # Update the connection
+        encrypted_credentials = encrypt_data(json.dumps(new_credentials))
+        
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE api_connections 
+            SET institution_name = ?, api_type = ?, encrypted_credentials = ?, last_sync = NULL
+            WHERE id = ? AND user_id = ?
+        ''', (institution_name, api_type, encrypted_credentials, connection_id, session['user_id']))
+        conn.commit()
+        conn.close()
+        
+        flash('API connection updated successfully!', 'success')
+        return redirect(url_for('api_connections'))
+    
+    return render_template('edit_api_connection.html', 
+                         connection={
+                             'id': connection_id,
+                             'institution_name': connection[0],
+                             'api_type': connection[1],
+                             'credentials': credentials
+                         })
+
 if __name__ == '__main__':
     init_database()
     app.run(debug=True, host='127.0.0.1', port=5000)

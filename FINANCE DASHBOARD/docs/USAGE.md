@@ -137,6 +137,38 @@ Each account is displayed as a color-coded card:
    - Click "Add Connection"
    - Connection appears in API connections list
 
+#### Managing API Connections
+
+**Editing Connections:**
+1. **Navigate to API Connections:**
+   - Click "API Connections" in sidebar
+   - Find the connection you want to edit
+
+2. **Edit Connection:**
+   - Click "Edit" button on the connection card
+   - Modify institution name, service type, or credentials
+   - Click "Update Connection" to save changes
+
+3. **Security Note:**
+   - Credentials are re-encrypted when updated
+   - Last sync time is reset after editing
+   - Changes take effect immediately
+
+**Deleting Connections:**
+1. **Navigate to API Connections:**
+   - Click "API Connections" in sidebar
+   - Find the connection you want to delete
+
+2. **Delete Connection:**
+   - Click "Delete" button on the connection card
+   - Confirm deletion in the popup dialog
+   - Connection is permanently removed
+
+3. **Important Notes:**
+   - Deletion cannot be undone
+   - Automatic data syncing will stop
+   - Historical data remains in your accounts
+
 #### Supported Banks
 Plaid supports 11,000+ financial institutions including:
 - Chase Bank

@@ -134,6 +134,8 @@ encrypted_credentials = cipher_suite.encrypt(json.dumps(credentials).encode()).d
 - **HTTPS Only**: All API communications over secure connections
 - **Token Management**: Secure access token handling
 - **Error Handling**: No credential exposure in error messages
+- **Edit/Delete Security**: Secure credential editing and deletion
+- **User Isolation**: API keys scoped to individual users
 
 **Yahoo Finance API:**
 - **No Credentials Required**: Public API with no authentication

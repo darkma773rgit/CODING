@@ -415,6 +415,46 @@ def get_crypto_data(symbols):
 }
 ```
 
+#### GET /edit_api_connection/<connection_id>
+**Purpose:** Edit API connection form
+
+**Response:** HTML form for editing connection
+
+#### POST /edit_api_connection/<connection_id>
+**Purpose:** Update API connection
+
+**Request:**
+```json
+{
+  "institution_name": "Updated Bank Name",
+  "api_type": "plaid",
+  "plaid_client_id": "new_client_id",
+  "plaid_secret": "new_secret_key",
+  "plaid_access_token": "new_access_token"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API connection updated successfully"
+}
+```
+
+#### POST /delete_api_connection/<connection_id>
+**Purpose:** Delete API connection
+
+**Request:** No body required
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "API connection for [Institution Name] has been deleted"
+}
+```
+
 ### Data Synchronization Endpoints
 
 #### POST /sync_data

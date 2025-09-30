@@ -64,6 +64,10 @@ The Finance Dashboard is a secure, local web application built with Flask that p
 │   ├── Dashboard Routes
 │   ├── Account Management Routes
 │   ├── API Integration Routes
+│   │   ├── Add API Connection
+│   │   ├── Edit API Connection
+│   │   ├── Delete API Connection
+│   │   └── List API Connections
 │   └── Data Synchronization Routes
 └── Security Middleware
 ```
@@ -76,6 +80,10 @@ The Finance Dashboard is a secure, local web application built with Flask that p
 ├── YFinanceAPI (Stock/Crypto Data)
 ├── FinancialDataManager
 │   ├── Credential Management
+│   │   ├── Add API Connection
+│   │   ├── Edit API Connection
+│   │   ├── Delete API Connection
+│   │   └── List API Connections
 │   ├── Data Synchronization
 │   ├── Account Updates
 │   └── Transaction Processing
